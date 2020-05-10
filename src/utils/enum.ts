@@ -4,6 +4,6 @@ export enum ENTRY_TYPE {
 }
 
 export enum PAYMENT_STATUS {
-  'Pago',
   'Nao Pago',
+  'Pago',
 }
