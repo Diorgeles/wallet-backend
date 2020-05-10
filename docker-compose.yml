@@ -1,0 +1,21 @@
+version: '3'
+services:
+  server:
+    image: my-wallet-backend:latest
+    build: .
+    env_file: .env.development
+    environment:
+      - PORT=3001
+    ports:
+      - '3001:3001'
+    volumes:
+      - './src:/app/src'
+      - './migrations:/app/migrations'
+      - './nest-cli.json:/app/nest-cli.json'
+      - './nodemon.json:/app/nodemon.json'
+      - './ormconfig.ts:/app/ormconfig.ts'
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:11.5-alpine
+    env_file: .env.development

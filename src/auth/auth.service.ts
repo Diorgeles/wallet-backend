@@ -1,8 +1,8 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import { UsersService } from 'users/users.service';
 import { User } from 'entities/user.entity';
+import * as bcrypt from 'bcrypt';
 import { SessionsService } from 'sessions/sessions.service';
 
 @Injectable()
@@ -15,6 +15,8 @@ export class AuthService {
 
   async validateUser(userEmail: string, userPassword: string): Promise<any> {
     try {
+      // If user is not found it will reject the promise
+      // and go to catch step
       const user = await this.usersService.findByEmail(userEmail);
       if (user && (await bcrypt.compare(userPassword, user.password))) {
         const { id, email, isAdmin } = user;
@@ -28,6 +30,7 @@ export class AuthService {
     }
   }
 
+  // Checks if current JWT token is associated with an user
   async validateJwtUser(jwt: string): Promise<User> {
     try {
       const session = await this.sessionsService.findOneOrFail(
@@ -35,6 +38,8 @@ export class AuthService {
         { select: ['jwt', 'userId'] },
       );
 
+      // Checks if token is still valid
+      // Checking it here allow us to remove this token from our session database
       this.jwtService.verify(jwt, { ignoreExpiration: false });
 
       const user = await this.usersService.findOne(session.userId, {
