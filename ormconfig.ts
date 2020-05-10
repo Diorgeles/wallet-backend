@@ -22,7 +22,6 @@ if (process.env.NODE_ENV === 'development') {
 module.exports = {
   type: 'postgres',
   ...config,
-
   migrationsRun: true,
   logging: true,
   logger: 'advanced-console',
