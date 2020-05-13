@@ -1,18 +1,24 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Crud, CrudController } from '@nestjsx/crud';
 import { EntryService } from './entry.service';
-import { EntryDto } from './dto/entry.dto';
+import { Entry } from 'entities/entry.entity';
+import { CreateEntryDTO } from './dto/CreateEntry.dto';
+import { UpdateEntryDTO } from './dto/UpdateEntry.dto';
+import { JwtAuthGuard } from 'auth/guards/jwtAuth.guard';
 
-@Controller('entry')
-export class EntryController {
-  constructor(private readonly entryService: EntryService) {}
-
-  @Get('expenses')
-  getAllExpenses(): EntryDto[] {
-    return this.entryService.getAllExpenses();
-  }
-
-  @Get('recipes')
-  getAllRecipes(): EntryDto[] {
-    return this.entryService.getAllRecipes();
-  }
+@ApiTags('entries')
+@ApiBearerAuth()
+@Crud({
+  model: { type: Entry },
+  routes: { exclude: ['createManyBase', 'replaceOneBase'] },
+  dto: {
+    create: CreateEntryDTO,
+    update: UpdateEntryDTO,
+  },
+})
+@UseGuards(JwtAuthGuard)
+@Controller('entries')
+export class EntryController implements CrudController<Entry> {
+  constructor(public readonly service: EntryService) {}
 }
